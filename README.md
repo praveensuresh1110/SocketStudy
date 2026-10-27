@@ -58,54 +58,40 @@ Socket programming finds applications in various domains, including web developm
 ```
 import socket
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('localhost', 8000))
-s.listen(5)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-print("Waiting for client...")
-c, addr = s.accept()
-print(f"Client connected from {addr}")
+server.bind(("localhost", 8000))
+server.listen(1)
 
-try:
-    while True:
-        data = input("Enter a data: ")
-        c.sendall(data.encode())
+print("Server is waiting for a client...")
 
-        ack = c.recv(1024).decode()
-        if not ack:
-            print("Client disconnected.")
-            break
-        print("Acknowledgement:", ack)
-finally:
-    c.close()
-    s.close()
+conn, addr = server.accept()
+print("Client connected:", addr)
+
+data = conn.recv(1024).decode()
+print("Message from client:", data)
+
+conn.sendall("Hello from Server!".encode())
+
+conn.close()
+server.close()
 ```
 ## CLIENT
 ```
 import socket
 
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(("localhost", 8000))
 
-
-s.connect(('localhost', 8000))
 print("Connected to server successfully.")
 
-try:
-    while True:
-        
-        data = s.recv(1024).decode()
-        if not data:
-            print("Server closed the connection.")
-            break
+client.sendall("Hello from Client!".encode())
 
-        print(f"Received from server: {data}")
+data = client.recv(1024).decode()
+print("Message from server:", data)
 
-        
-        ack = "Received: " + data
-        s.sendall(ack.encode())
-finally:
-    s.close()
+client.close()
 ```
 
 ## OUTPUT
